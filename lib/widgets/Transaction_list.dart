@@ -4,20 +4,22 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> userTransaction;
+  final Function deleteTransaction;
 
-  TransactionList(this.userTransaction);
+  TransactionList(this.userTransaction, this.deleteTransaction);
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-        height: 300,
         width: double.infinity,
         child: userTransaction.isEmpty
             ? Column(
                 children: <Widget>[
                   Text('No Transaction available'),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Container(
                     height: 200,
                     child: Image.asset(
@@ -30,6 +32,33 @@ class TransactionList extends StatelessWidget {
             : ListView.builder(
                 itemBuilder: (ctx, index) {
                   return Card(
+                    elevation: 6,
+                    margin: EdgeInsets.all(10),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 30,
+                        child: Padding(
+                            padding: EdgeInsets.all(6),
+                            child: FittedBox(
+                                child: Text(
+                                    '\$${userTransaction[index].amount}'))),
+                      ),
+                      title: Text(
+                        userTransaction[index].title,
+                        style: Theme.of(context).textTheme.title,
+                      ),
+                      subtitle: Text(DateFormat.yMMMd()
+                          .format(userTransaction[index].date)),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        color: Colors.red,
+                        onPressed: () =>
+                            deleteTransaction(userTransaction[index].id),
+                      ),
+                    ),
+                  );
+
+                  /*Card(
                     child: Row(
                       children: <Widget>[
                         Container(
@@ -64,7 +93,7 @@ class TransactionList extends StatelessWidget {
                         )
                       ],
                     ),
-                  );
+                  );*/
                 },
                 itemCount: userTransaction.length,
               ));

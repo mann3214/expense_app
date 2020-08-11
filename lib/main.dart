@@ -3,10 +3,15 @@ import 'package:expense_app/widgets/NewTransaction.dart';
 import 'package:expense_app/widgets/Transaction_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'models/transaction.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(MyApp());
 }
 
@@ -45,14 +50,20 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> transaction = [
     Transaction(id: '0', title: 'shoes', amount: 12.32, date: DateTime.now()),
-    Transaction(id: '1', title: 'cloths', amount: 200.10, date: DateTime.now()),
+    Transaction(id: '1', title: 'cloths', amount: 20.10, date: DateTime.now()),
   ];
 
-  void _addTransaction(String title, double amount) {
+  void _deleteTransaction(String id) {
+    setState(() {
+      transaction.removeWhere((element) => element.id == id);
+    });
+  }
+
+  void _addTransaction(String title, double amount, DateTime choosenDate) {
     var newTx = Transaction(
         title: title,
         amount: amount,
-        date: DateTime.now(),
+        date: choosenDate,
         id: DateTime.now().toString());
     setState(() {
       transaction.add(newTx);
@@ -84,19 +95,20 @@ class _MyHomePageState extends State<MyHomePage> {
           });
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Expense App',
-          style: TextStyle(fontFamily: 'lato'),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddTransaction(context),
-          )
-        ],
+    final appBar = AppBar(
+      title: Text(
+        'Expense App',
+        style: TextStyle(fontFamily: 'lato'),
       ),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddTransaction(context),
+        )
+      ],
+    );
+    return Scaffold(
+      appBar: appBar,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         child: IconButton(
@@ -112,8 +124,16 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
 //            width: double.infinity,
                 width: double.infinity,
-                child: Chart(_recentTransaction)),
-            TransactionList(transaction)
+                child: Container(
+                    height: (MediaQuery.of(context).size.height * .4 -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top),
+                    child: Chart(_recentTransaction))),
+            Container(
+                height: (MediaQuery.of(context).size.height * .6 -
+                    appBar.preferredSize.height -
+                    MediaQuery.of(context).padding.top),
+                child: TransactionList(transaction, _deleteTransaction))
           ],
         ),
       ),

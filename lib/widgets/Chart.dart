@@ -14,7 +14,7 @@ class Chart extends StatelessWidget {
       final weekDay = DateTime.now().subtract(Duration(days: index));
       double totalSum = 0.0;
 
-      for (var i = 0; i < 0; i++) {
+      for (var i = 0; i < recentTransaction.length; i++) {
         if (recentTransaction[i].date.day == weekDay.day &&
             recentTransaction[i].date.month == weekDay.month &&
             recentTransaction[i].date.year == weekDay.year) {
@@ -26,7 +26,7 @@ class Chart extends StatelessWidget {
         'Day': DateFormat.E().format(weekDay).substring(0, 1),
         'amount': totalSum
       };
-    });
+    }).reversed.toList();
   }
 
   double get maxSpending {
@@ -39,16 +39,21 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Card(
-      /*ngfjknsdkfgnskdnfgklsdnfg*/
-
       elevation: 6,
       margin: EdgeInsets.all(20),
       child: Container(
         padding: EdgeInsets.all(5),
         child: Row(
           children: groupTransaction.map((e) {
-            return ChartBar(e['Day'], e['amount'],
-                (e['amount'] as double) / maxSpending);
+            return Flexible(
+              fit: FlexFit.tight,
+              child: ChartBar(
+                  e['Day'],
+                  e['amount'],
+                  maxSpending == 0.0
+                      ? 0.0
+                      : (e['amount'] as double) / maxSpending),
+            );
           }).toList(),
         ),
       ),
